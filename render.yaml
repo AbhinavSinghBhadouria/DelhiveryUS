@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: delhiveryus-api
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5001
+      - key: DATABASE_URL
+        sync: false          # Set this in Render dashboard → Neon connection string
+      - key: JWT_SECRET
+        generateValue: true  # Render auto-generates a secure secret
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false          # Set this to your Vercel frontend URL
+      - key: EMAIL_PROVIDER
+        value: nodemailer
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false          # Set this to your Gmail address
+      - key: SMTP_PASS
+        sync: false          # Set this to your Gmail App Password (16 chars)
+      - key: EMAIL_FROM
+        sync: false          # Set same as SMTP_USER (your Gmail)
+      - key: SMS_PROVIDER
+        value: mock

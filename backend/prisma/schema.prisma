@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  AGENT
+}
+
+enum OrderType {
+  B2B
+  B2C
+}
+
+enum PaymentType {
+  PREPAID
+  COD
+}
+
+enum RateType {
+  INTRA_ZONE
+  INTER_ZONE
+}
+
+enum OrderStatus {
+  CREATED
+  CONFIRMED
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RESCHEDULED
+  CANCELLED
+}
+
+enum RescheduleStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id                  String                @id @default(cuid())
+  name                String
+  email               String                @unique
+  phone               String?
+  passwordHash        String
+  role                UserRole
+  isEmailVerified     Boolean               @default(false)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  agentProfile        Agent?
+  customerOrders      Order[]               @relation("CustomerOrders")
+  createdOrders       Order[]               @relation("CreatedOrders")
+  trackingEvents      OrderTrackingEvent[]
+  rescheduleRequests  RescheduleRequest[]
+  notifications       Notification[]
+  emailVerifications  EmailVerification[]
+
+  @@map("users")
+}
+
+// OTP tokens for email verification on registration
+model EmailVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  otpHash   String   // bcrypt hash of the 6-digit OTP
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, used])
+  @@map("email_verifications")
+}
+
+model Zone {
+  id              String     @id @default(cuid())
+  name            String     @unique
+  description     String?
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  areas           ZoneArea[]
+  agents          Agent[]
+  pickupOrders    Order[]    @relation("PickupZone")
+  dropOrders      Order[]    @relation("DropZone")
+  fromRateCards   RateCard[] @relation("FromZone")
+  toRateCards     RateCard[] @relation("ToZone")
+
+  @@map("zones")
+}
+
+model ZoneArea {
+  id        String   @id @default(cuid())
+  zoneId    String
+  areaName  String
+  pincode   String
+  city      String
+  state     String
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+  zone      Zone     @relation(fields: [zoneId], references: [id])
+
+  @@unique([pincode, areaName])
+  @@map("zone_areas")
+}
+
+model Agent {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  currentZoneId    String?
+  currentLatitude  Decimal? @db.Decimal(10, 7)
+  currentLongitude Decimal? @db.Decimal(10, 7)
+  isAvailable      Boolean  @default(true)
+  activeOrderCount Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
+  currentZone      Zone?    @relation(fields: [currentZoneId], references: [id])
+  assignedOrders   Order[]
+
+  @@map("agents")
+}
+
+model RateCard {
+  id          String    @id @default(cuid())
+  orderType   OrderType
+  fromZoneId  String
+  toZoneId    String
+  rateType    RateType
+  minWeight   Decimal   @db.Decimal(10, 2)
+  maxWeight   Decimal   @db.Decimal(10, 2)
+  baseCharge  Decimal   @db.Decimal(10, 2)
+  perKgCharge Decimal   @db.Decimal(10, 2)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  fromZone    Zone      @relation("FromZone", fields: [fromZoneId], references: [id])
+  toZone      Zone      @relation("ToZone", fields: [toZoneId], references: [id])
+
+  @@index([orderType, fromZoneId, toZoneId, minWeight, maxWeight])
+  @@unique([orderType, fromZoneId, toZoneId, minWeight, maxWeight])
+  @@map("rate_cards")
+}
+
+model CodSurcharge {
+  id              String    @id @default(cuid())
+  orderType       OrderType @unique
+  surchargeAmount Decimal   @db.Decimal(10, 2)
+  isActive        Boolean   @default(true)
+
+  @@map("cod_surcharges")
+}
+
+model Order {
+  id                    String               @id @default(cuid())
+  customerId            String
+  createdByUserId       String
+  assignedAgentId       String?
+  pickupAddress         String
+  pickupArea            String
+  pickupPincode         String
+  pickupZoneId          String
+  dropAddress           String
+  dropArea              String
+  dropPincode           String
+  dropZoneId            String
+  length                Decimal              @db.Decimal(10, 2)
+  breadth               Decimal              @db.Decimal(10, 2)
+  height                Decimal              @db.Decimal(10, 2)
+  actualWeight          Decimal              @db.Decimal(10, 2)
+  volumetricWeight      Decimal              @db.Decimal(10, 2)
+  billableWeight        Decimal              @db.Decimal(10, 2)
+  orderType             OrderType
+  paymentType           PaymentType
+  baseCharge            Decimal              @db.Decimal(10, 2)
+  codCharge             Decimal              @db.Decimal(10, 2)
+  finalCharge           Decimal              @db.Decimal(10, 2)
+  status                OrderStatus          @default(CREATED)
+  scheduledDeliveryDate DateTime?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  customer              User                 @relation("CustomerOrders", fields: [customerId], references: [id])
+  createdBy             User                 @relation("CreatedOrders", fields: [createdByUserId], references: [id])
+  assignedAgent         Agent?               @relation(fields: [assignedAgentId], references: [id])
+  pickupZone            Zone                 @relation("PickupZone", fields: [pickupZoneId], references: [id])
+  dropZone              Zone                 @relation("DropZone", fields: [dropZoneId], references: [id])
+  trackingEvents        OrderTrackingEvent[]
+  rescheduleRequests    RescheduleRequest[]
+  notifications         Notification[]
+
+  @@index([customerId, status])
+  @@index([assignedAgentId, status])
+  @@index([pickupZoneId, dropZoneId])
+  @@map("orders")
+}
+
+model OrderTrackingEvent {
+  id          String       @id @default(cuid())
+  orderId     String
+  oldStatus   OrderStatus?
+  newStatus   OrderStatus
+  actorUserId String
+  actorRole   UserRole
+  note        String?
+  createdAt   DateTime     @default(now())
+  order       Order        @relation(fields: [orderId], references: [id])
+  actor       User         @relation(fields: [actorUserId], references: [id])
+
+  @@index([orderId, createdAt])
+  @@map("order_tracking_events")
+}
+
+model RescheduleRequest {
+  id                  String           @id @default(cuid())
+  orderId             String
+  requestedByUserId   String
+  oldDeliveryDate     DateTime?
+  newDeliveryDate     DateTime
+  reason              String?
+  status              RescheduleStatus @default(REQUESTED)
+  createdAt           DateTime         @default(now())
+  order               Order            @relation(fields: [orderId], references: [id])
+  requestedBy         User             @relation(fields: [requestedByUserId], references: [id])
+
+  @@index([orderId, createdAt])
+  @@map("reschedule_requests")
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  orderId   String?
+  userId    String
+  channel   NotificationChannel
+  recipient String
+  subject   String?
+  message   String
+  provider  String
+  status    NotificationStatus  @default(PENDING)
+  createdAt DateTime            @default(now())
+  order     Order?              @relation(fields: [orderId], references: [id])
+  user      User                @relation(fields: [userId], references: [id])
+
+  @@index([orderId, userId])
+  @@map("notifications")
+}

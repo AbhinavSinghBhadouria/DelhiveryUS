@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: delhiveryus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: delhiveryus_lastmile
+    ports:
+      - "55432:5432"
+    volumes:
+      - delhiveryus_pgdata:/var/lib/postgresql/data
+
+volumes:
+  delhiveryus_pgdata:

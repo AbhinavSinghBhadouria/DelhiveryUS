@@ -14,6 +14,7 @@ import Layout from "./components/Layout.jsx";                 // header + nav + 
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
+import Home from "./pages/Home.jsx";
 import CustomerDashboard from "./pages/customer/Dashboard.jsx";
 import CreateOrder from "./pages/customer/CreateOrder.jsx";
 import MyOrders from "./pages/customer/MyOrders.jsx";
@@ -77,7 +78,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/" element={<HomeRedirect />} />
+          <Route path="/" element={<Home />} />
 
           {/* customer routes - sirf CUSTOMER role allowed hai
               ProtectedRoute components/ProtectedRoute.jsx mein hai - role check karta hai

@@ -27,7 +27,10 @@ async function getTransporter() {
       auth: {
         user: env.smtpUser,
         pass: env.smtpPass
-      }
+      },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 5000
     });
     isEthereal = false;
     return cachedTransporter;

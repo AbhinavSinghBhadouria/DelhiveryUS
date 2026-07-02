@@ -201,6 +201,49 @@ export async function sendOtpEmail({ to, otp, name }) {
     return { provider: "nodemailer", status: "SENT" };
   }
 
+  // --- Resend REST API for OTP ---
+  if (env.emailProvider === "resend" && env.emailApiKey) {
+    const sender = env.emailFrom || "onboarding@resend.dev";
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.emailApiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        from: `"${env.emailFromName}" <${sender}>`,
+        to: [to],
+        subject,
+        text: message,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #1a1a2e; padding: 20px; border-radius: 8px 8px 0 0;">
+              <h2 style="color: #fff; margin: 0;">DelhiveryUS</h2>
+              <p style="color: #aaa; margin: 4px 0 0;">Last-Mile Delivery Tracker</p>
+            </div>
+            <div style="background: #f9f9f9; padding: 24px; border-radius: 0 0 8px 8px; border: 1px solid #eee;">
+              <h3 style="color: #333;">Verify Your Email Address</h3>
+              <p style="color: #555; font-size: 15px;">Hi ${name},</p>
+              <p style="color: #555; font-size: 15px;">Use the OTP below to verify your account. It expires in <strong>15 minutes</strong>.</p>
+              <div style="text-align: center; margin: 32px 0;">
+                <span style="font-size: 36px; font-weight: bold; letter-spacing: 10px; color: #1a1a2e; background: #e8f0fe; padding: 16px 24px; border-radius: 8px;">${otp}</span>
+              </div>
+              <p style="color: #999; font-size: 13px;">Do not share this OTP with anyone. If you did not register, ignore this email.</p>
+            </div>
+          </div>
+        `
+      })
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Resend API failed: ${errorBody}`);
+    }
+
+    console.log(`[Resend] OTP email sent to ${to}`);
+    return { provider: "resend", status: "SENT" };
+  }
+
   // mock mode - development mein OTP console mein print karo taaki testing ho sake
   console.log(`[Mock OTP Email] To: ${to} | OTP: ${otp}`);
   return { provider: "mock", status: "SENT" };

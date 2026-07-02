@@ -2,7 +2,7 @@
 
 Full-stack delivery management platform: customers place orders with live quotes, admins configure zones and pricing, agents update delivery status, and every status change is recorded in an immutable tracking timeline.
 
-**Hosted app:** Deploy frontend to [Vercel](https://vercel.com) and backend to [Render](https://render.com) — see [Deployment](#deployment). Replace this line with your live URL after deploying.
+**Hosted app:** [https://delhivery-us.vercel.app](https://delhivery-us.vercel.app)
 
 ## Tech Stack
 

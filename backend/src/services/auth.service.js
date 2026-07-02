@@ -18,6 +18,7 @@ import { toPublicUser } from "../utils/user-response.js";
 
 // sendOtpEmail - OTP email bhejne ke liye (Nodemailer ya mock)
 import { sendOtpEmail } from "./notification/providers.js";
+import { env } from "../config/env.js";
 
 // generateOtp - cryptographically safe 6-digit OTP banata hai
 function generateOtp() {
@@ -48,7 +49,14 @@ async function createAndSendOtp(user) {
   });
 
   // email bhejo - mock mode mein console log hoga
-  await sendOtpEmail({ to: user.email, otp, name: user.name });
+  try {
+    await sendOtpEmail({ to: user.email, otp, name: user.name });
+  } catch (error) {
+    console.error(`[Email Error] Failed to send OTP email via ${env.emailProvider}:`, error.message);
+    console.log(`-----------------------------------------------------------------`);
+    console.log(`[Email Fallback Log] Verification OTP for ${user.email} is: ${otp}`);
+    console.log(`-----------------------------------------------------------------`);
+  }
 }
 
 // registerUser - naya user banana

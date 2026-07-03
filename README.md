@@ -279,27 +279,3 @@ Email and SMS use a provider adapter pattern in `backend/src/services/notificati
 - **Real SMS:** Set `SMS_PROVIDER=twilio` with Twilio credentials.
 
 On every order status change, both email and SMS channels are attempted and logged.
-
-## Submission Checklist
-
-### Code & documentation (complete)
-
-- [x] Complete source (backend + frontend)
-- [x] README with setup, API docs, schema, rate logic
-- [x] [docs/api.md](docs/api.md) and [docs/database-schema.md](docs/database-schema.md)
-- [x] `.env.example` with placeholders only
-- [x] [docs/system-design.md](docs/system-design.md) under 800 words
-- [x] `.gitignore` excludes `.env`, `node_modules`, build artifacts
-- [x] Backend tests (`npm test` — unit + integration)
-- [x] Manual QA checklist in [docs/manual-test-checklist.md](docs/manual-test-checklist.md)
-- [x] Demo seed data and credentials documented
-
-### Deployment & submission (you complete these)
-
-- [ ] Public GitHub repo pushed to `main`
-- [ ] Hosted application URL in README header
-- [ ] Zip archive (if your submission portal requires it)
-
-## License
-
-MIT — assignment submission project.

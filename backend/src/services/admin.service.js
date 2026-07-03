@@ -223,7 +223,8 @@ export async function listAgents(query = {}) {
   const agents = await prisma.agent.findMany({
     where: {
       isAvailable: query.isAvailable,
-      currentZoneId: query.zoneId
+      currentZoneId: query.zoneId,
+      user: { isEmailVerified: true }
     },
     include: {
       user: {
@@ -247,7 +248,7 @@ export async function listAgents(query = {}) {
 
 export async function listCustomers() {
   return prisma.user.findMany({
-    where: { role: "CUSTOMER" },
+    where: { role: "CUSTOMER", isEmailVerified: true },
     select: {
       id: true,
       name: true,

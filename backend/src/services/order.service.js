@@ -202,6 +202,10 @@ export async function assignAgentManually(orderId, agentId, actor) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) throw new AppError("Order not found", 404);
 
+  if (order.status === "DELIVERED") {
+    throw new AppError("Cannot assign agent to a delivered order", 400);
+  }
+
   const agent = await prisma.agent.findUnique({
     where: { id: agentId },
     include: { user: true }
@@ -219,6 +223,10 @@ export async function assignAgentManually(orderId, agentId, actor) {
 export async function autoAssignAgent(orderId, actor) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) throw new AppError("Order not found", 404);
+
+  if (order.status === "DELIVERED") {
+    throw new AppError("Cannot assign agent to a delivered order", 400);
+  }
 
   // findBestAvailableAgent agent-assignment.service.js se - zone + distance + workload
   const agent = await findBestAvailableAgent(order);
@@ -287,6 +295,10 @@ export async function updateOrderStatus(orderId, input, actor) {
   });
 
   if (!order) throw new AppError("Order not found", 404);
+
+  if (order.status === "DELIVERED") {
+    throw new AppError("Cannot update status of a delivered order", 400);
+  }
 
   // agent sirf apna assigned order update kar sakta hai
   if (actor.role === "AGENT") {

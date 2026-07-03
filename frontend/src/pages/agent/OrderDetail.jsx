@@ -72,23 +72,29 @@ export default function AgentOrderDetail() {
           <p><strong>Drop:</strong> {order.dropAddress}, {order.dropArea}</p>
           <p><strong>Customer:</strong> {order.customer?.name}</p>
 
-          <form onSubmit={handleUpdate} className="form">
-            <h3>Update Status</h3>
-            <label>
-              New status
-              {/* AGENT_STATUSES se dropdown banao - sirf allowed statuses dikhao */}
-              <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
-                {AGENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </label>
-            <label>
-              Note (optional)
-              <input value={note} onChange={(e) => setNote(e.target.value)} />
-            </label>
-            <button type="submit" className="btn btn-primary" disabled={updating}>
-              {updating ? "Updating..." : "Update Status"}
-            </button>
-          </form>
+          {order.status !== "DELIVERED" ? (
+            <form onSubmit={handleUpdate} className="form">
+              <h3>Update Status</h3>
+              <label>
+                New status
+                {/* AGENT_STATUSES se dropdown banao - sirf allowed statuses dikhao */}
+                <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+                  {AGENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+              <label>
+                Note (optional)
+                <input value={note} onChange={(e) => setNote(e.target.value)} />
+              </label>
+              <button type="submit" className="btn btn-primary" disabled={updating}>
+                {updating ? "Updating..." : "Update Status"}
+              </button>
+            </form>
+          ) : (
+            <p className="muted" style={{ marginTop: "1.5rem" }}>
+              <em>This order has been delivered. No further actions can be taken.</em>
+            </p>
+          )}
         </section>
 
         <section className="card">

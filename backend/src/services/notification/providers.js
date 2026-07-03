@@ -104,6 +104,7 @@ export async function sendEmail({ to, subject, message }) {
 
   // --- Resend REST API ---
   if (env.emailProvider === "resend" && env.emailApiKey) {
+    const sender = env.emailFrom || "onboarding@resend.dev";
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -111,10 +112,26 @@ export async function sendEmail({ to, subject, message }) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: env.emailFrom,
+        from: `"${env.emailFromName}" <${sender}>`,
         to: [to],
         subject,
-        text: message
+        text: message,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #1a1a2e; padding: 20px; border-radius: 8px 8px 0 0;">
+              <h2 style="color: #fff; margin: 0;">DelhiveryUS</h2>
+              <p style="color: #aaa; margin: 4px 0 0;">Last-Mile Delivery Tracker</p>
+            </div>
+            <div style="background: #f9f9f9; padding: 24px; border-radius: 0 0 8px 8px; border: 1px solid #eee;">
+              <h3 style="color: #333;">${subject}</h3>
+              <p style="color: #555; font-size: 15px; line-height: 1.6;">${message}</p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+              <p style="color: #999; font-size: 12px;">
+                Yeh ek automated message hai. Isko reply mat karo.
+              </p>
+            </div>
+          </div>
+        `
       })
     });
 
@@ -123,6 +140,7 @@ export async function sendEmail({ to, subject, message }) {
       throw new Error(`Resend API failed: ${errorBody}`);
     }
 
+    console.log(`[Resend] Email sent to ${to} — subject: "${subject}"`);
     return { provider: "resend", status: "SENT" };
   }
 

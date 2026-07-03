@@ -94,31 +94,39 @@ export default function AdminOrderDetail() {
           <p><strong>Charge:</strong> ₹{order.finalCharge}</p>
           <p><strong>Agent:</strong> {order.assignedAgent?.user?.name || "Unassigned"}</p>
 
-          <h3>Assignment</h3>
-          <div className="btn-row">
-            <select value={selectedAgent} onChange={(e) => setSelectedAgent(e.target.value)}>
-              {agents.map((a) => (
-                <option key={a.id} value={a.id}>{a.user?.name} ({a.isAvailable ? "available" : "busy"})</option>
-              ))}
-            </select>
-            <button type="button" className="btn btn-primary" onClick={assignAgent}>Assign</button>
-            <button type="button" className="btn btn-ghost" onClick={autoAssign}>Auto-assign</button>
-          </div>
+          {order.status !== "DELIVERED" ? (
+            <>
+              <h3>Assignment</h3>
+              <div className="btn-row">
+                <select value={selectedAgent} onChange={(e) => setSelectedAgent(e.target.value)}>
+                  {agents.map((a) => (
+                    <option key={a.id} value={a.id}>{a.user?.name} ({a.isAvailable ? "available" : "busy"})</option>
+                  ))}
+                </select>
+                <button type="button" className="btn btn-primary" onClick={assignAgent}>Assign</button>
+                <button type="button" className="btn btn-ghost" onClick={autoAssign}>Auto-assign</button>
+              </div>
 
-          <h3>Status Override</h3>
-          <form onSubmit={updateStatus} className="form">
-            <label>
-              Status
-              <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
-                {ADMIN_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </label>
-            <label>
-              Note
-              <input value={statusNote} onChange={(e) => setStatusNote(e.target.value)} />
-            </label>
-            <button type="submit" className="btn btn-primary">Update Status</button>
-          </form>
+              <h3>Status Override</h3>
+              <form onSubmit={updateStatus} className="form">
+                <label>
+                  Status
+                  <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+                    {ADMIN_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Note
+                  <input value={statusNote} onChange={(e) => setStatusNote(e.target.value)} />
+                </label>
+                <button type="submit" className="btn btn-primary">Update Status</button>
+              </form>
+            </>
+          ) : (
+            <p className="muted" style={{ marginTop: "1.5rem" }}>
+              <em>This order has been delivered. No further actions can be taken.</em>
+            </p>
+          )}
         </section>
 
         <section className="card">

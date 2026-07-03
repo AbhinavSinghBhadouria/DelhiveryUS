@@ -44,6 +44,23 @@ export default function Login() {
         {/* ErrorAlert - dismiss karne pe setError("") se message clear ho jaata hai */}
         <ErrorAlert message={error} onDismiss={() => setError("")} />
 
+        {error && error.toLowerCase().includes("verify your email") && (
+          <div style={{ marginTop: "-8px", marginBottom: "16px", textAlign: "center" }}>
+            <Link
+              to="/verify-email"
+              state={{ email }}
+              style={{
+                color: "var(--primary, #6366f1)",
+                fontWeight: "bold",
+                textDecoration: "underline",
+                fontSize: "14px"
+              }}
+            >
+              Click here to verify your email
+            </Link>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="form">
           <label>
             Email

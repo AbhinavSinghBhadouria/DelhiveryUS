@@ -68,8 +68,54 @@ export async function registerUser(input) {
   });
 
   if (existingUser) {
-    // 409 Conflict - duplicate email
-    throw new AppError("Email is already registered", 409);
+    if (existingUser.isEmailVerified) {
+      // 409 Conflict - duplicate email
+      throw new AppError("Email is already registered", 409);
+    }
+
+    // If user is NOT verified, allow re-registration by updating details and triggering a new OTP
+    const passwordHash = await bcrypt.hash(input.password, 10);
+    const user = await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        name: input.name,
+        phone: input.phone,
+        passwordHash,
+        role: input.role
+      }
+    });
+
+    // Sync agent profile if role changes
+    if (user.role === "AGENT") {
+      const existingAgent = await prisma.agent.findUnique({
+        where: { userId: user.id }
+      });
+      if (!existingAgent) {
+        await prisma.agent.create({
+          data: {
+            userId: user.id,
+            isAvailable: true
+          }
+        });
+      }
+    } else {
+      const existingAgent = await prisma.agent.findUnique({
+        where: { userId: user.id }
+      });
+      if (existingAgent) {
+        await prisma.agent.delete({
+          where: { userId: user.id }
+        });
+      }
+    }
+
+    // OTP generate karo aur email bhejo
+    await createAndSendOtp(user);
+
+    return {
+      message: "Registration successful. Please check your email for the OTP to verify your account.",
+      email: user.email
+    };
   }
 
   // password ko hash karo - salt rounds 10 standard hai

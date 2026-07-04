@@ -637,25 +637,51 @@ tr:hover td {
   }
 }
 
-/* Landing Page Styles */
+/* Landing Page Revamp Styles */
 .landing-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.08), transparent 45%), #0b0c0f;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Glow Orbs */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: 0;
+  pointer-events: none;
+}
+.orb-1 {
+  top: -10%;
+  right: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: rgba(212, 175, 55, 0.08);
+}
+.orb-2 {
+  bottom: 20%;
+  left: -10%;
+  width: 40vw;
+  height: 40vw;
+  background: rgba(212, 175, 55, 0.04);
 }
 
 .landing-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2.5rem;
-  background: rgba(11, 12, 15, 0.8);
-  backdrop-filter: blur(12px);
+  padding: 1.25rem 2.5rem;
+  background: rgba(11, 12, 15, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .landing-brand {
@@ -676,6 +702,17 @@ tr:hover td {
   display: flex;
   align-items: center;
   gap: 1.25rem;
+}
+
+.landing-nav-actions .user-name {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.landing-nav-actions .user-name strong {
+  color: #fff;
+}
+.signout-btn {
+  margin-left: 0.5rem;
 }
 
 .btn-outline {
@@ -723,11 +760,13 @@ tr:hover td {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1.15fr 0.85fr;
   align-items: center;
   gap: 4rem;
+  position: relative;
+  z-index: 10;
 }
 
 .hero-text {
@@ -740,9 +779,9 @@ tr:hover td {
   display: inline-flex;
   align-self: flex-start;
   font-size: 0.75rem;
-  padding: 0.3rem 0.8rem;
+  padding: 0.35rem 0.9rem;
   border-radius: 999px;
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(212, 175, 55, 0.08);
   color: var(--primary);
   border: 1px solid rgba(212, 175, 55, 0.2);
   font-weight: 700;
@@ -765,7 +804,7 @@ tr:hover td {
 .hero-text p {
   font-size: 1.15rem;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
 }
 
@@ -775,31 +814,273 @@ tr:hover td {
   margin-top: 0.5rem;
 }
 
-.hero-image-wrapper {
-  position: relative;
+.hero-btn {
+  padding: 0.75rem 1.75rem;
+  font-size: 0.95rem;
+}
+
+.hero-visual-wrapper {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+  width: 100%;
+}
+
+/* Glassmorphic Calculator Widget */
+.glass-card {
+  background: rgba(21, 24, 30, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  padding: 1.75rem;
+  position: relative;
+  z-index: 10;
+}
+
+.calculator-widget {
+  width: 100%;
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.widget-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.calculator-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.25rem;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: var(--surface);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.widget-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row label span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.form-row select {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 0.7rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-row select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.payment-options {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.payment-btn {
+  flex: 1;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--muted);
+  padding: 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-btn:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.payment-btn.active {
+  border-color: var(--primary);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--primary);
+}
+
+.range-label {
+  position: relative;
+}
+
+.range-label input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.calculator-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.result-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.result-price {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+.hero-img-card {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: #111318;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-image {
+  display: block;
   max-width: 100%;
   height: auto;
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 0.85;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hero-image:hover {
-  transform: translateY(-10px) rotate(1deg);
-  box-shadow: 0 30px 60px rgba(212, 175, 55, 0.15);
+.hero-img-card:hover .hero-image {
+  transform: scale(1.03);
 }
 
+/* Stats Counter Section */
+.landing-stats {
+  background: #07080a;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 2.25rem 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.stats-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #fff, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.03em;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 45px;
+  background: var(--border);
+}
+
+/* Features Section */
 .landing-features {
   background: #060709;
   border-top: 1px solid var(--border);
-  padding: 5rem 2rem;
+  padding: 6rem 2rem;
+  position: relative;
+  z-index: 10;
 }
 
 .features-container {
@@ -808,17 +1089,17 @@ tr:hover td {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 3.5rem;
+  gap: 4rem;
 }
 
 .features-header {
   text-align: center;
-  max-width: 600px;
+  max-width: 650px;
   margin: 0 auto;
 }
 
 .features-header h2 {
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: #fff;
   margin: 0 0 1rem;
@@ -827,8 +1108,8 @@ tr:hover td {
 
 .features-header p {
   color: var(--muted);
-  font-size: 1.05rem;
-  line-height: 1.5;
+  font-size: 1.1rem;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -841,43 +1122,49 @@ tr:hover td {
 .feature-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2.25rem;
+  border-radius: 18px;
+  padding: 2.5rem 2.25rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(212, 175, 55, 0.3);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transform: translateY(-8px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 .feature-icon {
-  font-size: 2rem;
+  font-size: 2.25rem;
   color: var(--primary);
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(212, 175, 55, 0.08);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid rgba(212, 175, 55, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.05) rotate(5deg);
 }
 
 .feature-card h3 {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #fff;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .feature-card p {
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
   font-size: 0.95rem;
   margin: 0;
 }
@@ -885,17 +1172,19 @@ tr:hover td {
 .landing-footer {
   border-top: 1px solid var(--border);
   background: #0b0c0f;
-  padding: 2.5rem;
+  padding: 3rem;
   text-align: center;
   color: var(--muted);
   font-size: 0.9rem;
+  position: relative;
+  z-index: 10;
 }
 
 @media (max-width: 968px) {
   .landing-hero {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 3rem;
+    gap: 3.5rem;
     padding: 3rem 1.5rem;
   }
 
@@ -911,8 +1200,24 @@ tr:hover td {
     justify-content: center;
   }
 
+  .hero-visual-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .stats-container {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
   .features-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 }
+
+

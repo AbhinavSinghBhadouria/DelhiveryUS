@@ -11,6 +11,29 @@ import {
   updateOrderStatus
 } from "../services/order.service.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import { prisma } from "../db/prisma.js";
+
+export const listServiceAreasHandler = asyncHandler(async (request, response) => {
+  const serviceAreas = await prisma.zoneArea.findMany({
+    where: {
+      zone: {
+        isActive: true
+      }
+    },
+    select: {
+      areaName: true,
+      pincode: true
+    },
+    orderBy: {
+      areaName: "asc"
+    }
+  });
+
+  response.json({
+    success: true,
+    data: { serviceAreas }
+  });
+});
 
 export const quoteOrderHandler = asyncHandler(async (request, response) => {
   const quote = await calculateOrderQuote(request.validated.body);

@@ -68,6 +68,7 @@ export const api = {
   getTracking: (id) => request(`/orders/${id}/tracking`),
   rescheduleOrder: (id, body) =>
     request(`/orders/${id}/reschedule`, { method: "POST", body: JSON.stringify(body) }),
+  getServiceAreas: () => request("/orders/service-areas"),
 
   // admin routes - admin.routes.js se - zones
   adminZones: (params) => request(`/admin/zones${toQuery(params)}`),

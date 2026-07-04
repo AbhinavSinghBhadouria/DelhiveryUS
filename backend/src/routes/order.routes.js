@@ -7,6 +7,7 @@ import {
   getOrderTrackingHandler,
   listAllOrdersHandler,
   listMyOrdersHandler,
+  listServiceAreasHandler,
   quoteOrderHandler,
   rescheduleOrderHandler,
   updateOrderStatusHandler
@@ -24,6 +25,8 @@ import {
 } from "../validators/order.validator.js";
 
 const router = Router();
+
+router.get("/service-areas", requireAuth, listServiceAreasHandler);
 
 router.post(
   "/quote",

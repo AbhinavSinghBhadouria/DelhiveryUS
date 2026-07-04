@@ -1,5 +1,5 @@
 // pages/customer/CreateOrder.jsx - 2 step flow hai: form → quote preview → confirm
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // api api/client.js se - quoteOrder aur createOrder calls
 import { api } from "../../api/client.js";
@@ -13,6 +13,7 @@ export default function CreateOrder() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [quote, setQuote] = useState(null);  // api.quoteOrder ka response yahan store hota hai
+  const [serviceAreas, setServiceAreas] = useState([]);
 
   // form state - pickup, drop, package dimensions aur order options sab ek jagah
   const [form, setForm] = useState({
@@ -22,6 +23,19 @@ export default function CreateOrder() {
     orderType: "B2C",
     paymentType: "PREPAID"
   });
+
+  // Load supported service areas on mount
+  useEffect(() => {
+    async function fetchAreas() {
+      try {
+        const response = await api.getServiceAreas();
+        setServiceAreas(response.data.serviceAreas || []);
+      } catch (err) {
+        console.error("Failed to load service areas:", err);
+      }
+    }
+    fetchAreas();
+  }, []);
 
   // updateNested - nested state update karne ka helper
   // (section, field) => (e) => ... - curried function hai, input onChange mein seedha lagate hain
@@ -93,13 +107,26 @@ export default function CreateOrder() {
               <input value={form.pickup.address} onChange={updateNested("pickup", "address")} required />
             </label>
             <div className="form-row">
-              <label>
-                Area
-                <input value={form.pickup.area} onChange={updateNested("pickup", "area")} required />
-              </label>
-              <label>
-                Pincode
-                <input value={form.pickup.pincode} onChange={updateNested("pickup", "pincode")} required />
+              <label style={{ gridColumn: "span 2" }}>
+                Area / Pincode
+                <select
+                  value={`${form.pickup.area}||${form.pickup.pincode}`}
+                  onChange={(e) => {
+                    const [area, pincode] = e.target.value.split("||");
+                    setForm(prev => ({
+                      ...prev,
+                      pickup: { ...prev.pickup, area: area || "", pincode: pincode || "" }
+                    }));
+                  }}
+                  required
+                >
+                  <option value="">-- Select Supported Service Area --</option>
+                  {serviceAreas.map((sa) => (
+                    <option key={`pickup-${sa.areaName}-${sa.pincode}`} value={`${sa.areaName}||${sa.pincode}`}>
+                      {sa.areaName} ({sa.pincode})
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
           </section>
@@ -111,13 +138,26 @@ export default function CreateOrder() {
               <input value={form.drop.address} onChange={updateNested("drop", "address")} required />
             </label>
             <div className="form-row">
-              <label>
-                Area
-                <input value={form.drop.area} onChange={updateNested("drop", "area")} required />
-              </label>
-              <label>
-                Pincode
-                <input value={form.drop.pincode} onChange={updateNested("drop", "pincode")} required />
+              <label style={{ gridColumn: "span 2" }}>
+                Area / Pincode
+                <select
+                  value={`${form.drop.area}||${form.drop.pincode}`}
+                  onChange={(e) => {
+                    const [area, pincode] = e.target.value.split("||");
+                    setForm(prev => ({
+                      ...prev,
+                      drop: { ...prev.drop, area: area || "", pincode: pincode || "" }
+                    }));
+                  }}
+                  required
+                >
+                  <option value="">-- Select Supported Service Area --</option>
+                  {serviceAreas.map((sa) => (
+                    <option key={`drop-${sa.areaName}-${sa.pincode}`} value={`${sa.areaName}||${sa.pincode}`}>
+                      {sa.areaName} ({sa.pincode})
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
           </section>
